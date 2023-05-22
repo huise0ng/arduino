@@ -1,54 +1,45 @@
 #include <LedControl.h>
 
-#define DIN 12
-#define CLK 11
-#define CS  10
-#define N_DM    1
-
-LedControl dm = LedControl(DIN, CLK, CS, N_DM);
+LedControl lc = LedControl(12, 10, 11, 1); // DIN, CLK, CS, 갯수
 
 void setup() {
-    Serial.begin(9600);
-    Serial.println(dm.getDeviceCount());
-    dm.shutdown(0, false);
-    dm.setIntensity(0, 4);
-    dm.clearDisplay(0);
+  lc.shutdown(0, false); // 라이브러리 초기화
+  lc.setIntensity(0, 8); // 밝기 설정 (0 ~ 15)
+  lc.clearDisplay(0); // 디스플레이 지우기
 }
 
 void loop() {
-    int i, j;
-    for(i=0;i<8;i++)
-    {
-        for(j=0;j<8;j++)
-        {
-            dm.setLed(0, i, j, true);
-            delay(100);
-        }
+  rotateAndFadeEffect();
+  delay(100); // 효과 간 딜레이
+}
+
+void rotateAndFadeEffect() {
+  for (int i = 0; i < 4; i++) {
+    // 왼쪽 변
+    for (int row = i; row <= 7 - i; row++) {
+      lc.setLed(0, i, row, HIGH);
+      delay(50); // 효과 속도 조절을 위한 딜레이
     }
-    for(i=0;i<8;i++)
-    {
-        for(j=0;j<8;j++)
-        {
-            dm.setLed(0, i, j, false);
-            delay(100);
-        }
+
+    // 아래쪽 변
+    for (int col = i + 1; col <= 6 - i; col++) {
+      lc.setLed(0, col, 7 - i, HIGH);
+      delay(50); // 효과 속도 조절을 위한 딜레이
     }
-    for(i=0;i<8;i++)
-    {
-        for(j=0;j<8;j++)
-        {
-            dm.setLed(0, i, j, true);
-            delay(100);
-            dm.setLed(0, i, j, false);
-        }
+
+    // 오른쪽 변
+    for (int row = 7 - i; row >= i; row--) {
+      lc.setLed(0, 7 - i, row, HIGH);
+      delay(50); // 효과 속도 조절을 위한 딜레이
     }
-    for(i=0;i<8;i++)
-    {
-        for(j=0;j<8;j++)
-        {
-            dm.setLed(0, j, i, true);
-            delay(100);
-            dm.setLed(0, j, i, false);
-        }
+
+    // 위쪽 변
+    for (int col = 6 - i; col >= i + 1; col--) {
+      lc.setLed(0, col, i, HIGH);
+      delay(50); // 효과 속도 조절을 위한 딜레이
     }
+  }
+
+  delay(500); // 전체 점등 상태 유지를 위한 딜레이
+  lc.clearDisplay(0); // 디스플레이 지우기
 }
